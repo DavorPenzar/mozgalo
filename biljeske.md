@@ -12,7 +12,6 @@
 - rijesiti problem gdje je UGOVORENI_IZNOS 0(nista)
 - vidjeti baratamo li samo sa kreditima ili i sa stednjama
 - nadovezujuci se na problem iznad, kako je moguce da se preostali iznos kredita moze za jedan kvartal povecati za 77423644 (ukoliko baratamo samo sa kreditima)
-- skuziti obuhvaca li nas dataset sve moguce kategorije iz stupaca "PROIZVOD", "VRSTA_PROIZVODA", "TIP_KAMATE" 
-- skuziti sto tocno oznacavaju stupci "STANJE_NA_KRAJU_PRETH_KVARTALA" i "STANJE_NA_KRAJU_KVARTALA"
+- skuziti obuhvaca li nas dataset sve moguce kategorije iz stupaca "PROIZVOD", "VRSTA_PROIZVODA", "TIP_KAMATE"
 
 --------------------------------------------------------------------------------------------------------------------
