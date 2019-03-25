@@ -1,6 +1,6 @@
-# mozgalo
+# Mozgalo
 
-Materijali za naše rješenje zadatka za natjecanje *Mozgalo* 2019. godine.
+Materijali za naše rješenje zadatka za natjecanje [*Mozgalo*](https://www.estudent.hr/category/natjecanja/mozgalo/) 2019. godine.
 
 Tim _Petty_:
   * Luka Naglić,
