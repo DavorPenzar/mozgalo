@@ -1,9 +1,9 @@
 # Biljeske i nejasnoće prilikom rješavanja problema sa Mozgala
 
 *Upute za pisanje file-a*:
-	- srodnu skupinu bilješki/nejasnoća odvajati znakovima "--------------------------------------------------------------------------------------------------------------------"
-	- staviti oznaku **RIJEŠENO** na kraj skupine ukoliko smo tu skupinu riješili, te po potrebi napisati rješenje problema
-	- dijakritike, gramaticki i pravopisno ispravan tekst nisu obavezni
+- srodnu skupinu bilješki/nejasnoća odvajati nizom znakova tipa "-"
+- staviti oznaku **RIJEŠENO** na kraj skupine ukoliko smo tu skupinu riješili, te po potrebi napisati rješenje problema
+- dijakritike, gramaticki i pravopisno ispravan tekst nisu obavezni
 
 ## Bilješke i nejasnoće:
 
