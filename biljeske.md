@@ -1,7 +1,7 @@
 # Biljeske i nejasnoće prilikom rješavanja problema sa Mozgala
 
 *Upute za pisanje file-a*:
-- srodnu skupinu bilješki/nejasnoća odvajati nizom znakova tipa "-"
+- srodnu skupinu bilješki/nejasnoća odvajati nizom znakova tipa '-'
 - staviti oznaku **RIJEŠENO** na kraj skupine ukoliko smo tu skupinu riješili, te po potrebi napisati rješenje problema
 - dijakritike, gramaticki i pravopisno ispravan tekst nisu obavezni
 
@@ -14,4 +14,5 @@
 - nadovezujuci se na problem iznad, kako je moguce da se preostali iznos kredita moze za jedan kvartal povecati za 77423644 (ukoliko baratamo samo sa kreditima)
 - skuziti obuhvaca li nas dataset sve moguce kategorije iz stupaca "PROIZVOD", "VRSTA_PROIZVODA", "TIP_KAMATE"
 
+**RIJESENO** --- > pogledati mail "Pitanja u vezi ovogodišnjeg zadatka"
 --------------------------------------------------------------------------------------------------------------------
