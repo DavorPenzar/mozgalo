@@ -1,6 +1,6 @@
 # Korisni materijali koji mogu pomoći u izradi projekta
 
-## Prvi dio - Feature Engineering
+## PRVI dio - Feature Engineering
 
 ### Library-ji koji analiziraju vremenske nizove
 - [tsfresh](https://tsfresh.readthedocs.io/en/latest/text/introduction.html)
@@ -10,8 +10,12 @@
 - [churn rate](https://en.wikipedia.org/wiki/Churn_rate)
 - [survival analysis](https://en.wikipedia.org/wiki/Survival_analysis)
 
+### Vremenski nizovi
+- [vremenski nizovi za supervised learning](https://machinelearningmastery.com/time-series-forecasting-supervised-learning/)
+- [podijela dataset-a](https://machinelearningmastery.com/backtest-machine-learning-models-time-series-forecasting/)
 
-## Drugi dio - Modeliranje i interpretabilnost
+
+## DRUGI dio - Modeliranje i interpretabilnost
 
 ### Library-ji pogodni za Gradient Boosting na Decision Tree-evima
 - [XGBoost](https://xgboost.readthedocs.io/en/latest/tutorials/model.html)
