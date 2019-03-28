@@ -20,4 +20,4 @@
 ### Library-ji pogodni za Gradient Boosting na Decision Tree-evima
 - [XGBoost](https://xgboost.readthedocs.io/en/latest/tutorials/model.html)
 - [catboost](https://github.com/catboost/catboost)
-- [shap](https://github.com/slundberg/shap) --> ovo navodno ima neku dodatnu fora analizu necega
+- [shap](https://github.com/slundberg/shap) --> ovo navodno ima neku dodatnu foru za analizu necega
