@@ -4,7 +4,7 @@
 
 ### Library-ji koji analiziraju vremenske nizove
 - [tsfresh](https://tsfresh.readthedocs.io/en/latest/text/introduction.html)
-- [prophet](https://github.com/facebook/prophet) --> Lipic ovo preporucuje
+- [prophet](https://github.com/facebook/prophet) --> bolja opcija od tsfresh-a
 
 ### Korisne stvari za (eksploatarnu) analizu 
 - [churn rate](https://en.wikipedia.org/wiki/Churn_rate)
@@ -12,7 +12,7 @@
 
 ### Vremenski nizovi
 - [vremenski nizovi za supervised learning](https://machinelearningmastery.com/time-series-forecasting-supervised-learning/)
-- [podijela dataset-a](https://machinelearningmastery.com/backtest-machine-learning-models-time-series-forecasting/)
+- [podjela dataset-a](https://machinelearningmastery.com/backtest-machine-learning-models-time-series-forecasting/)
 
 
 ## DRUGI dio - Modeliranje i interpretabilnost
