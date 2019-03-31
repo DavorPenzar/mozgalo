@@ -1,3 +1,10 @@
+##  ADDITIONAL CUSTOM SETTINGS
+
+# Data
+data/
+
+##  ORIGINAL .gitignore FOR PYTHON
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -121,9 +128,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-##  ADDITIONAL CUSTOM
-
-# Training dataset
-training_dataset_enc.*
-
