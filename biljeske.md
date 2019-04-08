@@ -16,3 +16,8 @@
 
 **RIJESENO** --- > pogledati mail "Pitanja u vezi ovogodišnjeg zadatka"
 --------------------------------------------------------------------------------------------------------------------
+
+- neki podaci ekonomskih indikatora nisu dostupni. To su npr. neki podaci iz 2000., 2001. i 2018.(najvise)
+- treba skuziti sto cemo sa tim podacima napraviti
+- treba skuziti koje cemo indikatore koristiti jer nema smisla uzimati neke indikatore koji ne govore neke korisne stvari
+--------------------------------------------------------------------------------------------------------------------
