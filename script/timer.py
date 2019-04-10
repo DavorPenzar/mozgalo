@@ -7,6 +7,7 @@ Skripta s funkcijama korisnima za mjerenje vremena.
 
 # Standardna Python biblioteka
 import math as _math
+import six as _six
 import time as _time
 
 # Definicija funkcije hms_time.
