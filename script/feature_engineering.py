@@ -146,6 +146,21 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
     if figure is not None:
         return (figure, original_axes)
 
+# Definicija funkcije split.
+def split (df, names = None):
+    """
+    Dohvati tablicu dobivenu sjecenjem originalne tablice/stupca.
+
+    Funkcija je zapravo omotac poziva
+        >>> pandas.DataFrame(df.tolist(), index = df.index, columns = names)
+
+    Povratna vrijednost je objekt klase pandas.DataFrame.
+
+    """
+
+    # Vrati trazenu tablicu.
+    return _pd.DataFrame(df.tolist(), index = df.index, columns = names)
+
 # Definicija funkcije transform.
 def transform (df, transformers):
     """
@@ -182,6 +197,21 @@ def transform (df, transformers):
         ),
         axis = 1
     )
+
+# Definicija funkcije dummify.
+def dummify (df, columns):
+    """
+    Dohvati pojavnost kategorija u tablici.
+
+    Funkcija je zapravo omotac poziva
+        >>> tuple(pandas.get_dummies(df[columns])).any(axis = 0).astype(numpy.uint8))
+
+    Povratna vrijednost je tuple ciji su objekti 0 ili 1 klase numpy.uint8.
+
+    """
+
+    # Vrati trazeni tuple.
+    return tuple(_pd.get_dummies(df[columns])).any(axis = 0).astype(_np.uint8))
 
 # Definicija funkcije feat.
 def feat (groups, features, row_id = 'ID'):
