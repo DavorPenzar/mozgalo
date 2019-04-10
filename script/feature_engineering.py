@@ -5,16 +5,19 @@ Skripta s funkcijama korisnima za "feature-engineering".
 
 """
 
-# Standardna Python biblioteka
+# Standardna Python biblioteka.
 import math as _math
 import six as _six
 
-# SciPy paketi
+# SciPy paketi.
 import matplotlib as _mpl
 import matplotlib.pyplot as _plt
 import numpy as _np
 import pandas as _pd
 import scipy as _sp
+
+# Seaborn.
+import seaborn as _sns
 
 # Definicija funkcije grouppie.
 def grouppie (df, columns, values, final_groups):
@@ -37,14 +40,17 @@ def grouppie (df, columns, values, final_groups):
     # Dohvati grupe tablice po stupcu/stupcima columns.
     columns_df = df.groupby(columns)
 
-    # Vrati jedinsvenu grupiranu tablicu ili tuple grupiranih tablica.
+    # Vrati jedinsvenu grupiranu tablicu ako je moguce.
     try:
         return columns_df.get_group(values).groupby(final_groups)
     except KeyError:
-        return tuple(
-            columns_df.get_group(value).groupby(final_groups)
-                for value in iter(values)
-        )
+        pass
+
+    # Vrati tuple grupiranih tablica.
+    return tuple(
+        columns_df.get_group(value).groupby(final_groups)
+            for value in iter(values)
+    )
 
 # Definicija funkcije plots.
 def plots (df, plotters, axes = None, axes_kwargs = None):
@@ -62,15 +68,9 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
                         ima odgovarajuce osi i tada je povratna vrijednost
                         tuple figure i konstruiranih osi,
         --  matplotlib.axes.Axes    --  svi se grafovi prikazuju na istim osima,
-        --  numpy.ndarray za dtype = matplotlib.axes.Axes   --  svaki graf ima
-                                                                svoje
-                                                                odgovarajuce osi
-                                                                (osi moze biti i
-                                                                viska ---
-                                                                uzima se prvih
-                                                                len(plotters),
-                                                                potrebno) ali ne
-                                                                manjka).
+        --  numpy.ndarray za dtype = matplotlib.axes.Axes
+            --  svaki graf ima svoje odgovarajuce osi (osi moze biti i viska ---
+                uzima se prvih len(plotters), ali ne manjka).
 
     Dodatno, svaki se graf moze urediti argumentom axes_kwargs (opcionalan;
     zadana vrijednost je None) pri cemu on moze biti:
@@ -79,6 +79,9 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
                         argumentima,
         --  lista rjecnika (dict)   --  svaki graf ima vlastite dodatne
                                         imenovane argumente za uredivanje.
+
+    Ako je axes objekt klase numpy.ndarray, liste (nuzno jednodimenzionalne)
+    plotters i axes_kwargs moraju pratiti raspored osi u axes.ravel().
 
     Povratna vrijednost je None osim ako argument axes nije None (vidi gore).
 
@@ -109,7 +112,7 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
     # Deduciraj funkciju za iteriranje po objektu plotters ovisno o njegovoj
     # klasi.
     plotters_iter = iter
-    if isinstance(plotter, dict):
+    if isinstance(plotters, dict):
         plotters_iter = _six.iteritems
 
     # Ako je axes jedinsvena vrijednost (ne lista vrijednosti), prosiri taj
@@ -143,6 +146,43 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
     if figure is not None:
         return (figure, original_axes)
 
+# Definicija funkcije transform.
+def transform (df, transformers):
+    """
+    Konstruiraj tablicu dobivenu transformacijom originalne tablice.
+
+    Povratna tablica dobivena je konkatenacijom po stupcima povratnih
+    vrijednosti poziva
+        >>> transformer(df[column])
+    za svaki uredeni par (column, transformer) u objektu transformers (dict ili
+    lista uredenih parova).  Specijalno, transformer moze biti i None cime se
+    stupac samo "prepisuje" u povratnu tablicu bez transformacije, to jest,
+    to je ekvivalentno sa slucajem da je transformer "identiteta".
+
+    Ako transformers nije dict, od istog se stupca originalne tablice moze
+    u povratnoj tablici moze konstruirati vise transformacija (u objektu
+    transformers moze se pojaviti vise uredenih parova cija je prva komponenta
+    jednaka).
+
+    Povratna vrijednost je objekt klase pandas.DataFrame.
+
+    """
+
+    # Deduciraj funkciju za iteriranje po objektu transformers ovisno o njegovoj
+    # klasi.
+    transformers_iter = iter
+    if isinstance(transformers, dict):
+        transformers_iter = _six.iteritems
+
+    # Vrati tablicu trazenih transformacija.
+    return _pd.concat(
+        tuple(
+            df[column] if transformer is None else transformer(df[column])
+                for column, transformer in transformers_iter(transformers)
+        ),
+        axis = 1
+    )
+
 # Definicija funkcije feat.
 def feat (groups, features, row_id = 'ID'):
     """
@@ -151,9 +191,10 @@ def feat (groups, features, row_id = 'ID'):
     Svakom uredenom paru (name, group) u objektu groups (pandas.GroupBy, dict
     ili lista uredenih parova) pridruzen je jedinstveni redak u povratnoj
     tablici.  Retci se konstruiraju pomocu objekta features (dict ili lista
-    uredenih parova) tako da se za svaki uredeni par (column, feature) u objektu
-    features u stupac column u redak pridruzen promatranoj grupi sprema
-    vrijednost poziva
+    uredenih parova --- ne smije biti obicni iterator jer se za svaku grupu
+    iterira po cijelom objektu features) tako da se za svaki uredeni par
+    (column, feature) u objektu features u stupac column u redak pridruzen
+    promatranoj grupi sprema vrijednost poziva
         >>> feature(group)
 
     Argument row_id (opcionalan; zadana vrijednost je 'ID') zadaje naziv prvog
@@ -164,36 +205,20 @@ def feat (groups, features, row_id = 'ID'):
 
     """
 
-    # Definicija pomocne funkcije features_iterkeys za iteriranje po
-    # "kljucevima" (prvi element) u listi uredenih parova (key, value).
-    def features_iterkeys (features):
-        """
-        Dohvacaj sve druge elemente tuple-ova u iterabilnom argumentu features.
-
-        """
-
-        for feature in iter(features):
-            yield feature[0]
-
-    # Definicija pomocne funkcije features_itervalues za iteriranje po
-    # "vrijednostima" (drugi element) u listi uredenih parova (key, value).
-    def features_itervalues (features):
-        """
-        Dohvacaj sve druge elemente tuple-ova u iterabilnom argumentu features.
-
-        """
-
-        for feature in iter(features):
-            yield feature[1]
-
     # Deduciraj funkciju za iteriranje po objektu groups ovisno o njegovoj
     # klasi.
     groups_iter = iter
     if isinstance(groups, dict):
         groups_iter = _six.iteritems
 
-    # Ako je objekt features rjecnik, azuriraj funkcije features_iterkeys i
-    # features_itervalues adekvatno.
+    # Deduciraj funkcieu za iteriranje po objektu features ovisno o njegovoj
+    # klasi.
+    features_iterkeys = lambda features : iter(
+        feature[0] for feature in iter(features)
+    )
+    features_itervalues = lambda features : iter(
+        feature[1] for feature in iter(features)
+    )
     if isinstance(features, dict):
         features_iterkeys = _six.iterkeys
         features_itervalues = _six.itervalues
