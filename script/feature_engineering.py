@@ -211,7 +211,7 @@ def dummify (df, columns):
     """
 
     # Vrati trazeni tuple.
-    return tuple(_pd.get_dummies(df[columns])).any(axis = 0).astype(_np.uint8))
+    return tuple(_pd.get_dummies(df[columns]).any(axis = 0).astype(_np.uint8))
 
 # Definicija funkcije feat.
 def feat (groups, features, row_id = 'ID'):
