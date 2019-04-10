@@ -6,7 +6,8 @@
 - [tsfresh](https://tsfresh.readthedocs.io/en/latest/text/introduction.html)
 - [prophet](https://github.com/facebook/prophet) --> bolja opcija od tsfresh-a
 
-### Korisne stvari za (eksploatarnu) analizu 
+### Korisne stvari za (eksploatarnu) analizu
+- [kategoricki featuri](https://www.datacamp.com/community/tutorials/categorical-data) 
 - [churn rate](https://en.wikipedia.org/wiki/Churn_rate)
 - [survival analysis](https://en.wikipedia.org/wiki/Survival_analysis)
 

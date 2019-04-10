@@ -17,7 +17,8 @@
 **RIJESENO** --- > pogledati mail "Pitanja u vezi ovogodišnjeg zadatka"
 --------------------------------------------------------------------------------------------------------------------
 
-- neki podaci ekonomskih indikatora nisu dostupni. To su npr. neki podaci iz 2000., 2001. i 2018.(najvise)
-- treba skuziti sto cemo sa tim podacima napraviti
-- treba skuziti koje cemo indikatore koristiti jer nema smisla uzimati neke indikatore koji ne govore neke korisne stvari
+- pitati ih kako je moguce da u test skupu podataka, koji je stavljen na CodaLab, postoje partije koje su se produzivale
+i za koje datum otvaranja dolazi poslije planiranog datuma zatvaranja. Naime, to na prvu uopce nema smisla pa nas zanima 
+objasnjenje u vezi toga. Konkretno, radi se o partiji oznake 261263 ciji je datum otvaranja 15.12.2018, a planirani datum
+zatvaranja 13.10.2018 
 --------------------------------------------------------------------------------------------------------------------
