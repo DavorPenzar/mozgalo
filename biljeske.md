@@ -17,8 +17,9 @@
 **RIJESENO** --- > pogledati mail "Pitanja u vezi ovogodišnjeg zadatka"
 --------------------------------------------------------------------------------------------------------------------
 
-- pitati ih kako je moguce da u test skupu podataka, koji je stavljen na CodaLab, postoje partije koje su se produzivale
-i za koje datum otvaranja dolazi poslije planiranog datuma zatvaranja. Naime, to na prvu uopce nema smisla pa nas zanima 
-objasnjenje u vezi toga. Konkretno, radi se o partiji oznake 261263 ciji je datum otvaranja 15.12.2018, a planirani datum
-zatvaranja 13.10.2018 
+- pitati ih kako je moguce da i u trening i u test skupu podataka, koji je stavljen na CodaLab, postoje partije za koje datum otvaranja 
+dolazi poslije planiranog datuma zatvaranja.Takvih partija u test skupu ima 2252. Smatramo da ovo isto pitanje, koje se odnosilo na trening skup, 
+nije dobro objasnjeno u FAQ-u. Nase potencijalno objasnjenje je da sve partije koje imaju DO >= PDZ su zapravo produzenje ugovora koje se dogodilo nakon
+PDZ i te su partije napravljene cisto iz neke bankarske formalnosti pa nije ni bitno koji im je novi PDZ
+- moramo promijeniti vrijednosti stupca PRIJEVREMENI_RASKID na nacin koji su opisali u FAQ-u. NE ZABORAVITI
 --------------------------------------------------------------------------------------------------------------------
