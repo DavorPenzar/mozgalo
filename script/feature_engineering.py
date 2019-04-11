@@ -20,7 +20,7 @@ import scipy as _sp
 import seaborn as _sns
 
 # Definicija funkcije grouppie.
-def grouppie (df, columns, values, final_groups):
+def grouppie (df, columns, values, final_groups = None):
     """
     Dohvati slozene grupe iz tablice.
 
@@ -173,6 +173,18 @@ def transform (df, transformers):
     lista uredenih parova).  Specijalno, transformer moze biti i None cime se
     stupac samo "prepisuje" u povratnu tablicu bez transformacije, to jest,
     to je ekvivalentno sa slucajem da je transformer "identiteta".
+
+    Moguce je za kljuc transformacije --- columns u uredenom paru
+    (columns, transformer) u objektu transformers --- zadati i listu stupaca.
+    Na primjer, legalno je
+        >>> df = pandas.DataFrame({'col1' : [0, 1, 0], 'col2' : [1, 1, 1]})
+        >>> transformers(df, [('col1', None), (['col1', 'col2'], lambda cols : cols['col1'] - cols['col2'])])
+           col1  0
+        0     0 -1
+        1     1  0
+        2     0 -1
+    I u tom slucaju transormer moze biti None cime se u povratnu tablicu
+    prepisuju stupci u onom poretku u kojem su zadani u listi column.
 
     Ako transformers nije dict, od istog se stupca originalne tablice moze
     u povratnoj tablici moze konstruirati vise transformacija (u objektu
