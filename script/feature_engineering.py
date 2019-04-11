@@ -206,7 +206,7 @@ def dummify (df, columns):
     Funkcija je zapravo omotac poziva
         >>> tuple(pandas.get_dummies(df[columns])).any(axis = 0).astype(numpy.uint8))
 
-    Povratna vrijednost je tuple ciji su objekti 0 ili 1 klase numpy.uint8.
+    Povratna vrijednost je tuple ciji su objekti 0 ili 1.
 
     """
 
