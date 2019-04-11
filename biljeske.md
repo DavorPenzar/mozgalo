@@ -17,7 +17,9 @@
 **RIJESENO** --- > pogledati mail "Pitanja u vezi ovogodišnjeg zadatka"
 --------------------------------------------------------------------------------------------------------------------
 
-- neki podaci ekonomskih indikatora nisu dostupni. To su npr. neki podaci iz 2000., 2001. i 2018.(najvise)
-- treba skuziti sto cemo sa tim podacima napraviti
-- treba skuziti koje cemo indikatore koristiti jer nema smisla uzimati neke indikatore koji ne govore neke korisne stvari
+- pitati ih kako je moguce da i u trening i u test skupu podataka, koji je stavljen na CodaLab, postoje partije za koje datum otvaranja 
+dolazi poslije planiranog datuma zatvaranja.Takvih partija u test skupu ima 2252. Smatramo da ovo isto pitanje, koje se odnosilo na trening skup, 
+nije dobro objasnjeno u FAQ-u. Nase potencijalno objasnjenje je da sve partije koje imaju DO >= PDZ su zapravo produzenje ugovora koje se dogodilo nakon
+PDZ i te su partije napravljene cisto iz neke bankarske formalnosti pa nije ni bitno koji im je novi PDZ
+- moramo promijeniti vrijednosti stupca PRIJEVREMENI_RASKID na nacin koji su opisali u FAQ-u. NE ZABORAVITI
 --------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,10 @@
+##  ADDITIONAL CUSTOM SETTINGS
+
+# Data
+data/
+
+##  ORIGINAL .gitignore FOR PYTHON
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
