@@ -6,8 +6,17 @@ Skripta s funkcijama korisnima za "feature-engineering".
 """
 
 # Standardna Python biblioteka.
+import copy as _copy
+import datetime as _datetime
+import functools as _functools
 import math as _math
+import os as _os
+import random as _random
 import six as _six
+import string as _string
+import sys as _sys
+import time as _time
+import warnings as _warnings
 
 # SciPy paketi.
 import matplotlib as _mpl
@@ -15,6 +24,7 @@ import matplotlib.pyplot as _plt
 import numpy as _np
 import pandas as _pd
 import scipy as _sp
+import sympy as _sym
 
 # Seaborn.
 import seaborn as _sns
@@ -147,19 +157,31 @@ def plots (df, plotters, axes = None, axes_kwargs = None):
         return (figure, original_axes)
 
 # Definicija funkcije split.
-def split (df, names = None):
+def split (column, names = None):
     """
-    Dohvati tablicu dobivenu sjecenjem originalne tablice/stupca.
+    Dohvati tablicu dobivenu sjecenjem originalnog stupca.
 
-    Funkcija je zapravo omotac poziva
-        >>> pandas.DataFrame(df.tolist(), index = df.index, columns = names)
+    Argument names (opcionalan; zadana vrijednost je None) zadaje imena
+    stupaca povratne tablice.
+
+    Funkcija je, za names = None, zapravo omotac poziva
+        >>> pandas.DataFrame(column.tolist(), index = df.index)
+    a inace je omotac poziva
+        >>> pandas.DataFrame(column.tolist(), index = df.index, columns = names)
 
     Povratna vrijednost je objekt klase pandas.DataFrame.
 
     """
 
     # Vrati trazenu tablicu.
-    return _pd.DataFrame(df.tolist(), index = df.index, columns = names)
+    return (
+        _pd.DataFrame(column.tolist(), index = column.index) if names is None
+            else _pd.DataFrame(
+                column.tolist(),
+                index = column.index,
+                columns = names
+            )
+    )
 
 # Definicija funkcije transform.
 def transform (df, transformers):
@@ -211,19 +233,94 @@ def transform (df, transformers):
     )
 
 # Definicija funkcije dummify.
-def dummify (df, columns):
+def dummify (df, columns, count_vals = False):
     """
     Dohvati pojavnost kategorija u tablici.
 
-    Funkcija je zapravo omotac poziva
-        >>> tuple(pandas.get_dummies(df[columns])).any(axis = 0).astype(numpy.uint8))
+    Argument count_vals (opcionalan; zadana vrijednost je False) zadaje
+    zbrajaju li se pojavnosti kategorija ili se samo gleda barem jedna
+    pojavnost.
+
+    Funkcija je, za count_vals = False, zapravo omotac poziva
+        >>> tuple(pandas.get_dummies(df[columns])).any(axis = 0).tolist())
+    a za count_vals = True omotac poziva
+        >>> tuple(pandas.get_dummies(df[columns])).sum(axis = 0).astype(int).tolist())
 
     Povratna vrijednost je tuple ciji su objekti 0 ili 1.
 
     """
 
     # Vrati trazeni tuple.
-    return tuple(_pd.get_dummies(df[columns]).any(axis = 0).astype(_np.uint8))
+    return (
+        tuple(_pd.get_dummies(df[columns]).sum(axis = 0).tolist()) if count_vals
+            else tuple(
+                _pd.get_dummies(df[columns]).any(axis = 0).astype(int).tolist()
+            )
+    )
+
+# Definicija funkcije firstie.
+def firstie (df, column, alt = None):
+    """
+    Dohvati prvu definiranu vrijednost u stupcu tablice.
+
+    Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
+    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    (pandas.DataFrame) nedefinirane (NaN).
+
+    Povratna vrijednost je element u stupcu column tablice df ili alt.
+
+    """
+
+    # Dohvati indeks prve definirane vrijednosti u stupcu column tablice df.
+    i = df[column].first_valid_index()
+
+    # Vrati trazenu vrijednost.
+    return alt if i is None else df.loc[i, column]
+
+# Definicija funkcije randomie.
+def randomie (df, column, alt = None):
+    """
+    Dohvati slucajno odabranu definiranu vrijednost u stupcu tablice.
+
+    Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
+    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    (pandas.DataFrame) nedefinirane (NaN).
+
+    Povratna vrijednost je element u stupcu column tablice df ili alt.
+
+    """
+
+    # Dohvati indekse definiranih vrijednosti u stupcu column tablice df.
+    valids = df.index[_pd.notnull(df[column])]
+
+    # Vrati trazenu vrijednost.
+    return (
+        alt
+            if not valids.size
+            else df.loc[
+                valids[_np.random.randint(valids.size, dtype = int)],
+                column
+            ]
+    )
+
+# Definicija funkcije lastie.
+def lastie (df, column, alt = None):
+    """
+    Dohvati zadnju definiranu vrijednost u stupcu tablice.
+
+    Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
+    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    (pandas.DataFrame) nedefinirane (NaN).
+
+    Povratna vrijednost je element u stupcu column tablice df ili alt.
+
+    """
+
+    # Dohvati indeks zadnje definirane vrijednosti u stupcu column tablice df.
+    i = df[column].last_valid_index()
+
+    # Vrati trazenu vrijednost.
+    return alt if i is None else df.loc[i, column]
 
 # Definicija funkcije feat.
 def feat (groups, features, row_id = 'ID'):
