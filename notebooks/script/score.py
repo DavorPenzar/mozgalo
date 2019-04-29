@@ -10,12 +10,18 @@ import copy as _copy
 import datetime as _datetime
 import functools as _functools
 import math as _math
+<<<<<<< HEAD
 import os as _os
 import random as _random
 import six as _six
 import string as _string
 import sys as _sys
 import time as _time
+=======
+import random as _random
+import six as _six
+import string as _string
+>>>>>>> Dodane dvije davorove skripte za pravilan rad biljeznice za NN
 import warnings as _warnings
 
 # SciPy paketi.
