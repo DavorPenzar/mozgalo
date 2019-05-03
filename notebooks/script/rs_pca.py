@@ -725,7 +725,7 @@ class RS_PCA (object):
         self._translators = tuple(
             _copy.deepcopy(
                 _functools.partial(
-                    RS_PCA.simplex,
+                    RS_PCA.translate,
                     _copy.deepcopy(cat.categories)
                 )
             ) for cat in iter(self._categories)
