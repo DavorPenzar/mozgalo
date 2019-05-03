@@ -30,3 +30,9 @@ PDZ i te su partije napravljene cisto iz neke bankarske formalnosti pa nije ni b
 - moramo definirati F1 i MAPE score jer to se provjerava prilikom evaluacije naseg rjesenja na internetu(competition stranici)
 - PLANIRANI_DATUM_ZATVARANJA i VISINA_KAMATE mogu poprimiti null vrijednosti. Trebamo biti sigurni da pri transformaciji trening skupa ne napravimo
 neku glupost u vezi spljostavanja/transformiranja tih vrijednosti
+
+**RIJESENO**
+--------------------------------------------------------------------------------------------------------------------
+
+- probati dodati prosjecne bruto ili neto place te indeks potrosackih cijena
+- probati mozda, od onih prezivjelih feature-a ekonomije, ubaciti u PCA jer jos uvijek postoje nekakve korelacije medu njima
