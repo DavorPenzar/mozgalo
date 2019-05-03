@@ -25,7 +25,8 @@ import numpy as _np
 import pandas as _pd
 import scipy as _sp
 import sympy as _sym
-from pandas.core.dtypes.dtypes import CategoricalDtype as _CategoricalDtype
+from pandas.core.indexes.base import Index as _Index
+from pandas.core.series import Series as _Series
 from sympy.logic.boolalg import Boolean as _Boolean
 from sympy.core.numbers import Integer as _Integer
 
@@ -118,9 +119,9 @@ class RS_PCA (object):
 
         assert issubclass(cls, RS_PCA)
 
-        # Provjeri i saniraj sve argumenta.
+        # Provjeri i saniraj sve argumente.
 
-        assert isinstance(cat, _CategoricalDtype)
+        assert isinstance(cat, _Index)
 
         I = _np.where(cat == x)
 
@@ -677,15 +678,32 @@ class RS_PCA (object):
             pass
 
         # Deduciraj sve kategorije odnosno njihove vrijednosti.
+
         self._categories = tuple(
-            _pd.api.types.CategoricalDtype(
-                categories = _copy.deepcopy(df[col].unique().sort_values()),
-                ordered = False
-            ) for col in iter(self._columns)
+            _copy.deepcopy(df[col].unique()) for col in iter(self._columns)
         )
 
         try:
             del col
+        except (NameError, UnboundLocalError):
+            pass
+
+        self._categories = tuple(
+            _pd.api.types.CategoricalDtype(
+                categories = _copy.deepcopy(
+                    _np.sort(cat) if isinstance(cat, _np.ndarray)
+                        else cat.sort_values() if isinstance(
+                            cat,
+                            (_Index, _Series)
+                        )
+                        else cat
+                ),
+                ordered = False
+            ) for cat in iter(self._categories)
+        )
+
+        try:
+            del cat
         except (NameError, UnboundLocalError):
             pass
 
