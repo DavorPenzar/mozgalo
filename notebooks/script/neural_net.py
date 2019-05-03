@@ -104,7 +104,7 @@ class NeuralNet(nn.Module):
                 print("Trening konvergira u epohi {} sa loss-om: {}".format(epoch, losses[-1]))
                 break
             
-            if not (epoch % 100):
+            if not (epoch % 25):
                 print("Epoch {} - loss: {}".format(epoch, losses[-1]))
             
             
@@ -191,16 +191,28 @@ def cirkus_kratica(neural_net, X, y, threshold=0.5):
     )
 
 
-def smanji_pca(trening_set, broj_stupaca_za_sacuvati = 5):
+def smanji_pca(dataset1, dataset2, broj_stupaca_za_sacuvati = 5):
     '''
-        Funkcija koja u trening_set-u brise sve stupce nastale rs-pca postupkom ciji je header
+        Funkcija koja u dataset-u brise sve stupce nastale rs-pca postupkom ciji je header
         strogo veci od broj_stupaca_za_sacuvati. Po default-u je to broj 5
     '''
+
+    ## odredivanje broja pca stupaca
+    if(dataset1.shape[1] != dataset2.shape[1]):
+        raise RuntimeError('Trening i validajski skup imaju razlicit broj feature-a! Popravi to.')
+
+    broj_pca_stupaca = 0
+
+    for stupac in dataset1.columns.values:
+        if(isinstance(stupac, int)):
+            broj_pca_stupaca += 1
+
     stupci_za_izbaciti = []
     for i in range(broj_stupaca_za_sacuvati, broj_pca_stupaca, 1):
         stupci_za_izbaciti += [i]
 
-    trening_set.drop(columns=stupci_za_izbaciti, inplace=True)
+    dataset1.drop(columns=stupci_za_izbaciti, inplace=True)
+    dataset2.drop(columns=stupci_za_izbaciti, inplace=True)
 
 ###################################################################################################
 
@@ -226,40 +238,60 @@ def smanji_pca(trening_set, broj_stupaca_za_sacuvati = 5):
 ###################
 ###### TRENING SKUP
 ###################
+path_trening = '../../data/mocni_trening.pkl'
+trening = pd.read_pickle(path_trening)
 
-trening_set = pd.read_pickle('../../data/nakon_rspca.pkl')
-
-## smanjivanje vrijednosti ova dva stupca kako ne bi doslo do overflow-a
-## zanimljivo(i dobro) je to sto tablica nema Nan vrijednosti
-skala = 1.0e16
-trening_set['DATUM_OTVARANJA'] = trening_set['DATUM_OTVARANJA']/skala
-trening_set['PLANIRANI_DATUM_ZATVARANJA'] = trening_set['PLANIRANI_DATUM_ZATVARANJA']/skala
+path_validacijski = '../../data/mocni_validacijski.pkl'
+validacijski = pd.read_pickle(path_validacijski)
 
 
-## odredivanje broja pca stupaca
-broj_pca_stupaca = 0
+## definiranje stupaca za izbacivanje iz tablice
+stupci_za_dropat = [
+    'KLIJENT_ID', ### nema smisla da je unutra
+    'OZNAKA_PARTIJE', ### nema smisla da je unutra
+    'VALUTA', ### ovih 5 ispod je izbaceno jer su kategorijski feature-i
+    'VRSTA_KLIJENTA',
+    'PROIZVOD',
+    'VRSTA_PROIZVODA',
+    'TIP_KAMATE',
+    'GDP per capita, current prices\n (U.S. dollars per capita)', ### ovi ispod su ekonomski pokazatelji koje smo eminirali zbog koreliranosti
+    'GDP, current prices (Purchasing power parity; billions of international dollars)',
+    'GDP per capita, current prices (Purchasing power parity; international dollars per capita)',
+    'Implied PPP conversion rate (National currency per international dollar)',
+    'Inflation rate, end of period consumer prices (Annual percent change)',
+    'Population (Millions of people)',
+    'Current account balance\nU.S. dollars (Billions of U.S. dollars)',
+    'Net lending/borrowing (also referred as overall balance) (% of GDP)',
+    'Primary net lending/borrowing (also referred as primary balance) (% of GDP)',
+    'Expenditure (% of GDP)',
+    'Gross debt position (% of GDP)'
+    ]
 
-for stupac in trening_set.columns.values:
-    if(isinstance(stupac, int)):
-        broj_pca_stupaca += 1
+print(trening.shape, validacijski.shape)
 
+trening.drop(columns=stupci_za_dropat, inplace=True)
+validacijski.drop(columns=stupci_za_dropat, inplace=True)
 
 ## sadrzi samo neke(od njih broj_pca_stupaca) stupaca nastalih rs-pca-om
-smanji_pca(trening_set, 4)
+smanji_pca(trening, validacijski, broj_stupaca_za_sacuvati=4)
+
+print(trening.shape, validacijski.shape)
+
+## pogledajmo skupove za svaki slucaj
+# print(trening.head())
+# print(list(trening.columns.values))
+# print(validacijski.head())
+# print(list(validacijski.columns.values))
 
     
 ## pretvori sve u numpy koji ce se splitat na trening i validacijski skup, a kasnije ce se oni cast-ati u tensor
-X = np.array(trening_set.drop(columns=['KLIJENT_ID', 'OZNAKA_PARTIJE', 'PRIJEVREMENI_RASKID']).values, dtype=np.float32)
-y = np.array(trening_set['PRIJEVREMENI_RASKID'], dtype=np.float32)
+X_train = np.array(trening.drop(columns=['PRIJEVREMENI_RASKID']).values, dtype=np.float32)
+X_val = np.array(validacijski.drop(columns=['PRIJEVREMENI_RASKID']).values, dtype=np.float32)
 
-
-## kreiranje trening skupa i validacijskog skupa
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.27, shuffle=True, stratify=y)
-
-
-## zero-mean normalizacija podataka
-meanovi, stdovi = normalize_train(X_train)
-normalize_others(X_val, meanovi, stdovi)
+y_train = np.array(trening['PRIJEVREMENI_RASKID'], dtype=np.float32)
+y_val = np.array(validacijski['PRIJEVREMENI_RASKID'], dtype=np.float32)
+del trening
+del validacijski
 
 
 ## pretvorba iz numpy-a u torch
@@ -290,16 +322,16 @@ print('Pokrecem rad na ' + str(device))
 ###########################
 
 # kombinacije layer-a
-velicina_ulaza = X.shape[1]
+velicina_ulaza = X_train.shape[1]
 
 layers_combination = [
-    [velicina_ulaza, velicina_ulaza, 1]
+    [velicina_ulaza, 10, 10, 1]
     ]
 
 # parametri
-alphas = [1.5]
+alphas = [0.5]
 momentums = [0.75]
-lambdas = [0] # nijednom dosad nije uspjelo treniranje sa pozitivnim vrijednostima od lambda
+lambdas = [0.5] # nijednom dosad nije uspjelo treniranje sa pozitivnim vrijednostima od lambda
 
 
 # KOLIKO ZELIMO najboljih mreza spremiti
