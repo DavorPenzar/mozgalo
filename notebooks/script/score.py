@@ -143,26 +143,36 @@ class Score (object):
         # Ponisti ocjenu.
         self.reset()
 
-        # Izracunaj novu ocjenu.
-
+        # Dohvati vrijednosti.
         self._true_positives = _copy.deepcopy(int(true_positives))
         self._false_positives = _copy.deepcopy(int(false_positives))
         self._true_negatives = _copy.deepcopy(int(true_negatives))
         self._false_negatives = _copy.deepcopy(int(false_positives))
 
+        # Provjeri sume
+        if (
+            (
+                (self._true_positives + self._false_negatives) !=
+                self._n_positives
+            ) or
+            (self._true_negatives + self._false_positives) != self._n_negatives
+        ):
+            self.reset()
+
+            raise ValueError('Suma <>.')
+
+        # Izracunaj novu ocjenu.
+
         self._accuracy = (
             float(self._true_positives + self._true_negatives) /
             (self._n_positives + self._n_negatives)
         )
-        self._precision = float(self._true_positives) / self._n_positives
-        self._recall = (
+        self._precision = (
             float(self._true_positives) /
-            (self._true_positives + self._false_negatives)
+            (self._true_positives + self._false_positives)
         )
-        self._specificity = (
-            float(self._true_negatives) /
-            (self._false_positives + self._true_negatives)
-        )
+        self._recall = float(self._true_positives) / self._n_positives
+        self._specificity = float(self._true_negatives) / self._n_negatives
 
         return self
 

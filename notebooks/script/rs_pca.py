@@ -25,6 +25,7 @@ import numpy as _np
 import pandas as _pd
 import scipy as _sp
 import sympy as _sym
+from pandas.core.dtypes.dtypes import CategoricalDtype as _CategoricalDtype
 from sympy.logic.boolalg import Boolean as _Boolean
 from sympy.core.numbers import Integer as _Integer
 
@@ -104,7 +105,7 @@ class RS_PCA (object):
 
     # Bazna bijekcija za prijevod kategorickih vrijednosti u indekse.
     @classmethod
-    def _translate (cls, cat, x):
+    def translate (cls, cat, x):
         """
         Vrati indeks elementa x u konacnom nizu cat.
 
@@ -116,6 +117,10 @@ class RS_PCA (object):
         """
 
         assert issubclass(cls, RS_PCA)
+
+        # Provjeri i saniraj sve argumenta.
+
+        assert isinstance(cat, _CategoricalDtype)
 
         I = _np.where(cat == x)
 
@@ -130,24 +135,32 @@ class RS_PCA (object):
         return i
 
     @classmethod
-    def _simplex (cls, n):
+    def simplex (cls, n):
         """
         Dohvati koordinate vrhova rehularnog n-simpleksa.
 
         Arguments
         ---------
         n : int
-            Broj vrhova simpleksa.
+            Broj vrhova simpleksa.  Uzima se
+                >>> n = max(n, 0)
 
         Returns
         -------
         S : (n, n + 1) array
             Stupci povratne matrice predstavljaju vrhove regularnog n-simpleksa
-            u prostoru R^n.
+            u prostoru R^n za n >= 0.
 
         """
 
         assert issubclass(cls, RS_PCA)
+
+        # Provjeri i saniraj argument.
+
+        assert (
+            isinstance(n, _six.integer_types) or
+            isinstance(n, (bool, _np.bool, _Boolean, _np.integer, _Integer))
+        )
 
         # Ako je n <= 0, vrati "prazni" simpleks (matrica dimenzija 0 x 1).
         if n <= 0:
@@ -197,12 +210,12 @@ class RS_PCA (object):
             Tablica kategorickih stupaca.  U stupcima se ne bi smjela pojaviti
             nedefinirana vrijednost (NaN).
 
-        simplices : sequence of returns of _simplex
+        simplices : sequence of returns of simplex
             Niz duljine df.shape[1] tako da na i-tom mjestu stoji matrica
             koordinata regularnog (n - 1)-simpleksa gdje je n broj jedinstvenih
             vrijednosti u i-tom stupcu tablice df.
 
-        translators : sequence of partials (argument x missing) of _translate
+        translators : sequence of partials (argument x missing) of translate
             Niz duljine df.shape[1] tako da na i-tom mjestu stoji objekt ciji
             pozivi cine bijekciju izmedu jedinstvenih vrijednosti u i-tom stupcu
             tablice df i skupa {0, 1, ..., n - 1} (tipa int) gdje je n broj
@@ -280,12 +293,12 @@ class RS_PCA (object):
             Tablica kategorickih stupaca.  U stupcima se ne bi smjela pojaviti
             nedefinirana vrijednost (NaN).
 
-        simplices : sequence of returns of _simplex
+        simplices : sequence of returns of simplex
             Niz duljine df.shape[1] tako da na i-tom mjestu stoji matrica
             koordinata regularnog (n - 1)-simpleksa gdje je n broj jedinstvenih
             vrijednosti u i-tom stupcu tablice df.
 
-        translators : sequence of partials (argument x missing) of _translate
+        translators : sequence of partials (argument x missing) of translate
             Niz duljine df.shape[1] tako da na i-tom mjestu stoji objekt ciji
             pozivi cine bijekciju izmedu jedinstvenih vrijednosti u i-tom stupcu
             tablice df i skupa {0, 1, ..., n - 1} (tipa int) gdje je n broj
@@ -666,7 +679,7 @@ class RS_PCA (object):
         # Deduciraj sve kategorije odnosno njihove vrijednosti.
         self._categories = tuple(
             _pd.api.types.CategoricalDtype(
-                categories = _copy.deepcopy(df[col].unique()),
+                categories = _copy.deepcopy(df[col].unique().sort_values()),
                 ordered = False
             ) for col in iter(self._columns)
         )
@@ -678,7 +691,7 @@ class RS_PCA (object):
 
         # Izracunaj regularne simplekse za sve stupce.
         self._simplices = tuple(
-            RS_PCA._simplex(int(cat.categories.size - 1))
+            RS_PCA.simplex(int(cat.categories.size - 1))
                 for cat in iter(self._categories)
         )
 
@@ -712,7 +725,7 @@ class RS_PCA (object):
         self._translators = tuple(
             _copy.deepcopy(
                 _functools.partial(
-                    RS_PCA._translate,
+                    RS_PCA.simplex,
                     _copy.deepcopy(cat.categories)
                 )
             ) for cat in iter(self._categories)
