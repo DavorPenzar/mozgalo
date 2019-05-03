@@ -1,7 +1,7 @@
 import pandas as pd
 
-glavni_pokazatelji = pd.read_pickle('../ekonomski-pokazatelji/ekonomski_indikatori.pkl')
-place = pd.read_excel('../ekonomski-pokazatelji/place_i_indeksi.xlsx')
+glavni_pokazatelji = pd.read_pickle('../../ekonomski-pokazatelji/ekonomski_indikatori.pkl')
+place = pd.read_excel('../../ekonomski-pokazatelji/place_i_indeksi.xlsx')
 
 
 ############################################################
