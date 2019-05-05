@@ -10,31 +10,20 @@ import copy as _copy
 import datetime as _datetime
 import functools as _functools
 import math as _math
-import os as _os
+import numbers as _numbers
 import random as _random
 import six as _six
 import string as _string
-import sys as _sys
 import time as _time
-import random as _random
-import six as _six
-import string as _string
 import warnings as _warnings
 
 # SciPy paketi.
-import matplotlib as _mpl
-import matplotlib.pyplot as _plt
 import numpy as _np
 import pandas as _pd
-import scipy as _sp
-import sympy as _sym
+from pandas.core.arrays.categorical import Categorical as _Categorical
+from pandas.core.frame import DataFrame as _DataFrame
 from pandas.core.indexes.base import Index as _Index
 from pandas.core.series import Series as _Series
-from sympy.logic.boolalg import Boolean as _Boolean
-from sympy.core.numbers import Integer as _Integer
-
-# Seaborn.
-import seaborn as _sns
 
 # Definicija klase RS_PCA.
 class RS_PCA (object):
@@ -107,16 +96,24 @@ class RS_PCA (object):
 
     """
 
-    # Bazna bijekcija za prijevod kategorickih vrijednosti u indekse.
     @classmethod
     def translate (cls, cat, x):
         """
         Vrati indeks elementa x u konacnom nizu cat.
 
+        Arguments
+        ---------
+        cat : Index
+            Niz vrijednosti u kojima se trazi vrijednost x.
+
+        x
+            Vrijednost koja se trazi u nizu x.
+
         Returns
         -------
         i : int
-            Indeks i takav da vrijedi cat[i] == x.
+            Indeks i takav da vrijedi cat[i] == x.  Ako takav i ne postoji,
+            povratna vrijednost je None.
 
         """
 
@@ -124,10 +121,12 @@ class RS_PCA (object):
 
         # Provjeri i saniraj sve argumente.
 
-        assert isinstance(cat, _Index)
+        assert isinstance(cat, (_np.ndarray, _Index, _Series))
 
+        # Pronadi sve indekse gdje se x nalazi u cat.
         I = _np.where(cat == x)
 
+        # Ako postoji, pronadi prvi indeks vrijednosti x u cat.
         i = None
         try:
             i = _copy.deepcopy(int(I[0][0]))
@@ -136,6 +135,7 @@ class RS_PCA (object):
 
         del I
 
+        # Vrati trazeni indeks.
         return i
 
     @classmethod
@@ -161,10 +161,7 @@ class RS_PCA (object):
 
         # Provjeri i saniraj argument.
 
-        assert (
-            isinstance(n, _six.integer_types) or
-            isinstance(n, (bool, _np.bool, _Boolean, _np.integer, _Integer))
-        )
+        assert isinstance(n, _numbers.Integral)
 
         # Ako je n <= 0, vrati "prazni" simpleks (matrica dimenzija 0 x 1).
         if n <= 0:
@@ -176,13 +173,13 @@ class RS_PCA (object):
         # Izracunaj koordinate vrhova simpleksa.
         S = _np.zeros((n, n + 1), dtype = float, order = 'F')
         for i in iter(range(int(n))):
+            # Dohvati ispunjeni dio trenutnog stupca matrice S.
+            aux_x = S[:i, i]
+
             # Izracunaj p = || S[:i, i] ||^2.
+            p = _np.dot(aux_x, aux_x)
 
-            x = S[:i, i]
-
-            p = _np.dot(x, x)
-
-            del x
+            del aux_x
 
             # Izracunaj S[i, i] i S[i, i + 1:].
 
@@ -197,7 +194,6 @@ class RS_PCA (object):
             pass
 
         del k
-
         del n
 
         # Vrati izracunatu matricu koordinata vrhova.
@@ -409,7 +405,6 @@ class RS_PCA (object):
                 pass
 
             del X_mean
-
             del temp_file_name_base
             del n_simultaneous_instances
         else:
@@ -459,7 +454,7 @@ class RS_PCA (object):
         instance = super(RS_PCA, cls).__new__(cls)
 
         instance._shape = (0, 0, (0, 0), tuple())
-        instance._columns = tuple()
+        instance._columns = _pd.Index(list())
         instance._categories = tuple()
         instance._indices = tuple()
         instance._simplices = tuple()
@@ -504,7 +499,7 @@ class RS_PCA (object):
         # Postavi sve atribute na prazne vrijednosti.
 
         self._shape = (0, 0, (0, 0), tuple())
-        self._columns = tuple()
+        self._columns = _pd.Index(list())
         self._categories = tuple()
         self._indices = tuple()
         self._simplices = tuple()
@@ -528,6 +523,7 @@ class RS_PCA (object):
     def fit (
         self,
         df,
+        columns = None,
         save_temp = None,
         temp_file_name_base = None,
         n_simultaneous_instances = None
@@ -542,12 +538,17 @@ class RS_PCA (object):
         Arguments
         ---------
         df : DataFrame
-            Tablica kategorickih stupaca.  Iz tablice se prije analize brisu
-            svi retci u kojima postoji barem jedna nedefinirana vrijednost
-            (NaN) i takva "prociscena" tablica ne smije biti prazna.  Za
-            tretiranje i nedefiniranih vrijednosti kao zasebnih kategorickih
+            Tablica za RS-PCA.  Iz tablice se prije analize brisu svi retci
+            (u analiziranim stupcima) u kojima postoji barem jedna nedefinirana
+            vrijednost (NaN) i takva "prociscena" tablica ne smije biti prazna.
+            Za tretiranje i nedefiniranih vrijednosti kao zasebnih kategorickih
             vrijednosti moguce je nedefinirane vrijednosti zamijeniti novim
             vrijednostima (na primjer, 'NaN').
+
+        columns : None or Index, optional
+            Lista kategorickih stupaca nad kojima se vrsi RS-PCA.  Ako None,
+            analiza se vrsi nad svim stupcima dane tablice ciji je tip
+            vrijednosti object ili CategoricalDtype.
 
         save_temp : None or boolean, optional
             Ako True, dijelovi LRSV matrice tablice df (ako je redaka tablice df
@@ -590,25 +591,9 @@ class RS_PCA (object):
 
         # Provjeri i saniraj sve argumente.
 
-        assert isinstance(
-            df,
-            (_pd.core.frame.DataFrame, _pd.core.series.Series)
-        )
+        assert isinstance(df, (_DataFrame, _Index, _Series))
 
-        assert (
-            save_temp is None or
-            isinstance(save_temp, _six.integer_types) or
-            isinstance(
-                save_temp,
-                (
-                    bool,
-                    _np.bool,
-                    _Boolean,
-                    _np.integer,
-                    _Integer
-                )
-            )
-        )
+        assert (save_temp is None or isinstance(save_temp, _numbers.Integral))
         assert (
             temp_file_name_base is None or
             isinstance(temp_file_name_base, _six.string_types) or
@@ -617,23 +602,30 @@ class RS_PCA (object):
         )
         assert (
             n_simultaneous_instances is None or
-            isinstance(n_simultaneous_instances, _six.integer_types) or
-            isinstance(
-                n_simultaneous_instances,
-                (
-                    bool,
-                    _np.bool,
-                    _Boolean,
-                    _np.integer,
-                    _Integer
-                )
-            )
+            isinstance(n_simultaneous_instances, _numbers.Integral)
         )
 
-        if isinstance(df, _pd.core.series.Series):
+        if isinstance(df, (_Index, _Series)):
             df = df.to_frame().T
 
-        df = df.loc[_pd.notnull(df).all(axis = 1)]
+        if columns is None:
+            columns = [
+                col
+                    for col in iter(df.columns)
+                    if df[col].dtype.name in {'category', 'object'}
+            ]
+
+        try:
+            if columns in df.columns:
+                df = df[[columns]]
+            else:
+                df = df[columns]
+        except (TypeError, ValueError):
+            df = df[columns]
+
+        del columns
+
+        df = df.dropna(axis = 0, how = 'any')
 
         assert bool(df.size)
 
@@ -673,7 +665,7 @@ class RS_PCA (object):
         self.reset()
 
         # Deduciraj sve stupce.
-        self._columns = tuple(_copy.deepcopy(col) for col in df.columns)
+        self._columns = _pd.Index([_copy.deepcopy(col) for col in df.columns])
 
         try:
             del col
@@ -682,28 +674,61 @@ class RS_PCA (object):
 
         # Deduciraj sve kategorije odnosno njihove vrijednosti.
 
-        self._categories = tuple(
+        self._categories = [
             _copy.deepcopy(df[col].unique()) for col in iter(self._columns)
-        )
+        ]
 
         try:
             del col
         except (NameError, UnboundLocalError):
             pass
 
-        self._categories = tuple(
-            _pd.api.types.CategoricalDtype(
-                categories = _copy.deepcopy(
-                    _np.sort(cat) if isinstance(cat, _np.ndarray)
-                        else cat.sort_values() if isinstance(
-                            cat,
-                            (_Index, _Series)
+        with _warnings.catch_warnings():
+            _warnings.filterwarnings('error')
+            with _np.errstate(invalid = 'raise'):
+                for i in iter(range(len(self._categories))):
+                    if isinstance(self._categories[i], _Categorical):
+                        self._categories[i] = _np.asarray(self._categories[i])
+                    try:
+                        if isinstance(self._categories[i], _np.ndarray):
+                            self._categories[i] = (
+                                _pd.api.types.CategoricalDtype(
+                                    categories = _copy.deepcopy(
+                                        _np.sort(self._categories[i])
+                                    ),
+                                    ordered = False
+                                )
+                            )
+                        elif isinstance(self._categories[i], (_Index, _Series)):
+                            self._categories[i] = (
+                                _pd.api.types.CategoricalDtype(
+                                    categories = _copy.deepcopy(
+                                        self._categories[i].sort_values()
+                                    ),
+                                    ordered = False
+                                )
+                            )
+                        else:
+                            self._categories[i] = (
+                                _pd.api.types.CategoricalDtype(
+                                    categories = _copy.deepcopy(
+                                        self._categories[i]
+                                    ),
+                                    ordered = False
+                                )
+                            )
+                    except (TypeError, ValueError, RuntimeWarning):
+                        self._categories[i] = _pd.api.types.CategoricalDtype(
+                            categories = _copy.deepcopy(self._categories[i]),
+                            ordered = False
                         )
-                        else cat
-                ),
-                ordered = False
-            ) for cat in iter(self._categories)
-        )
+
+                try:
+                    del i
+                except (NameError, UnboundLocalError):
+                    pass
+
+        self._categories = tuple(self._categories)
 
         try:
             del cat
@@ -1019,10 +1044,12 @@ class RS_PCA (object):
 
         Arguments
         ---------
-        n_first : None or int, optional
+        n_first : None or int or float, optional
             Broj prvih glavnih komponenti koje se reinterpretiraju.  Ako None,
-            reinterpretiraju se sve glavne komponente.  Zadana vrijednost je
-            None.
+            racunaju se koordinate po svim glavnim komponentama.  Ako float,
+            vrijednost mora biti u intervalu [0, 1] i tada se uzima toliko
+            glavnih komponenti da zahvacuju udio varijabilnosti najblizi danoj
+            vrijednosti.  Zadana vrijednost je None.
 
         Returns
         coeff : (K, n_first) array
@@ -1032,7 +1059,9 @@ class RS_PCA (object):
             sim.shape[0] po svim sim u self.simplices).  U tom smislu i-ti
             stupac matrice coeff zadaje koeficijente u linearnoj kombinaciji
             spomenutih radij-vektora koja rezultira i-tom glavnom komponentom.
-            Ako je n_first None, povratna matrica je dimenzija K x K.
+            Ako je n_first None, povratna matrica je dimenzija K x K.  Ako je
+            n_first float, povratna matrica je dimenzija K x m gdje prvih m
+            glavnih komponenti zahvaca udio najblize n_first varijabilnosti.
 
         values : (K, n_first) DataFrame
             Tablica koja tumaci kojim kategorickim vrijednostima odgovaraju
@@ -1040,8 +1069,10 @@ class RS_PCA (object):
             po svim sim u self.simplices).  Na mjestu (i, j) povratne tablice
             (values.iloc[i, j]) stoji kategoricka vrijednost tako da coeff[i, j]
             predstavlja koeficijent za radij-vektor vrha simpleksa koji odgovara
-            toj kategorickoj vrijednosti. Ako je n_first None, povratna matrica
-            je dimenzija K x K.
+            toj kategorickoj vrijednosti.  Ako je n_first None, povratna tablica
+            je dimenzija K x K.  Ako je n_first float, povratna tablica je
+            dimenzija K x m gdje prvih m glavnih komponenti zahvaca udio
+            najblize n_first varijabilnosti.
 
         """
 
@@ -1049,25 +1080,24 @@ class RS_PCA (object):
 
         # Provjeri i saniraj argument.
 
-        assert (
-            n_first is None or
-            isinstance(n_first, _six.integer_types) or
-            isinstance(
-                n_first,
-                (
-                    bool,
-                    _np.bool,
-                    _Boolean,
-                    _np.integer,
-                    _Integer
-                )
-            )
-        )
+        assert n_first is None or isinstance(n_first, _numbers.Real)
 
         if n_first is None:
             n_first = self._shape[2][1]
+        elif isinstance(n_first, _numbers.Integral):
+            n_first = _copy.deepcopy(int(n_first))
+        else:
+            assert (
+                not (_math.isnan(n_first) or _math.isinf(n_first)) and
+                n_first >= 0 and
+                n_first <= 1
+            )
 
-        n_first = _copy.deepcopy(int(n_first))
+            n_first = int(
+                _np.abs(
+                    _np.cumsum(self._explained_variance_ratios) - n_first
+                ).argmin() + 1
+            )
 
         assert n_first > 0 and n_first <= self._shape[2][1]
 
@@ -1229,28 +1259,28 @@ class RS_PCA (object):
         Arguments
         ---------
         df : DataFrame
-            Tablica kategorickih stupaca.  Stupci tablice df i vrijednosti
-            koji se u njima pojavljuju trebali bi odgovarati formatu tablice
-            nad kojom je bila vrsena RS-PCA pozivom metode RS_PCA.fit (ako se
-            metoda RS_PCA.fit, na primjer, pozvala nad tablicom ciji su stupci
-            'A', 'B' i u kojima se pojavljuju jedinstvene vrijednosti
-            'A': ['a1', 'a2', 'a3'] i 'B': ['b1', 'b2', 'b3', 'b4'], onda bi i
-            tablica df trebala imati samo dva stupca i to takva da se u prvom
-            stupcu pojavljuju samo vrijednosti iz skupa {'a1', 'a2', 'a3'}, a u
-            drugom iz skupa {'b1', 'b2', 'b3', 'b4'}).
+            Tablica kategorickih stupaca.  Tablica df trebala bi sadrzavati
+            stupce nad kojima se vrsila RS-PCA analizirane tablice, a
+            vrijednosti u tablici df u tim stupcima trebali su se pojavljivati
+            u analiziranoj tablici.
 
-        n_first : None or int, optional
+        n_first : None or int or float, optional
             Broj prvih glavnih komponenti u cijim se koordinatama tablica df
             transformira.  Ako None, racunaju se koordinate po svim glavnim
-            komponentama.  Zadana vrijednost je None.
+            komponentama.  Ako float, vrijednost mora biti u intervalu [0, 1] i
+            tada se uzima toliko glavnih komponenti da zahvacuju udio
+            varijabilnosti najblizi danoj vrijednosti.  Zadana vrijednost je
+            None.
 
         Returns
         -------
         Y : (df.shape[0], n_first) array
             Matrica ciji retci odgovaraju redom koordinatama kategorickih redaka
-            tablice df u projekciji na prvih n_first glavnih kompone. Ako je
+            tablice df u projekciji na prvih n_first glavnih kompone.  Ako je
             n_first None, povratna matrica je dimenzija df_shape[0] x K gdje je
-            K zbroj sim.shape[0] po svim sim u self.simplices.
+            K zbroj sim.shape[0] po svim sim u self.simplices.  Ako je n_first
+            float, povratna matrica je dimenzija df.shape[0] x m gdje prvih m
+            glavnih komponenti zahvaca udio najblize n_first varijabilnosti.
 
         """
 
@@ -1258,28 +1288,27 @@ class RS_PCA (object):
 
         # Provjeri i saniraj sve argumente.
 
-        assert isinstance(
-            df,
-            (_pd.core.frame.DataFrame, _pd.core.series.Series)
-        )
+        assert isinstance(df, (_DataFrame, _Index, _Series))
 
-        assert (
-            n_first is None or
-            isinstance(n_first, _six.integer_types) or
-            isinstance(
-                n_first,
-                (
-                    bool,
-                    _np.bool,
-                    _Boolean,
-                    _np.integer,
-                    _Integer
-                )
-            )
-        )
+        assert n_first is None or isinstance(n_first, _numbers.Real)
 
-        if isinstance(df, _pd.core.series.Series):
+        if isinstance(df, (_Index, _Series)):
             df = df.to_frame().T
+
+        df = df[self._columns]
+
+        if not (n_first is None or isinstance(n_first, _numbers.Integral)):
+            assert (
+                not (_math.isnan(n_first) or _math.isinf(n_first)) and
+                n_first >= 0 and
+                n_first <= 1
+            )
+
+            n_first = int(
+                _np.abs(
+                    _np.cumsum(self._explained_variance_ratios) - n_first
+                ).argmin() + 1
+            )
 
         # Ako je n_first None, pomnozi LRSV matricu tablice df sa
         # self._components i vrati rezultat.
@@ -1378,7 +1407,7 @@ class RS_PCA (object):
     @property
     def columns (self):
         """
-        Tuple (col_0, col_1, ..., col_{n - 1}).
+        Indeks Index([col_0, col_1, ..., col_{n - 1}]).
 
         Vrijednosti:
             n   --  broj analiziranih stupaca,
@@ -1399,7 +1428,8 @@ class RS_PCA (object):
             n   --  broj analiziranih stupaca,
             m_i --  broj jedinstvenih vrijednosti u i-tom analiziranom stupcu,
             cat_{i, j}  --  j-ta jedinstvena vrijednost u i-tom analiziranom
-                            stupcu.
+                            stupcu (po mogucnosti nakon sortiranja jedinstvenih
+                            vrijednosti u i-tom analiziranom stupcu).
 
         """
 

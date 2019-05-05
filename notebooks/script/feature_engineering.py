@@ -7,24 +7,13 @@ Skripta s funkcijama korisnima za "feature-engineering".
 
 # Standardna Python biblioteka.
 import copy as _copy
-import datetime as _datetime
-import functools as _functools
 import math as _math
-import os as _os
-import random as _random
 import six as _six
-import string as _string
-import sys as _sys
-import time as _time
-import warnings as _warnings
 
 # SciPy paketi.
-import matplotlib as _mpl
 import matplotlib.pyplot as _plt
 import numpy as _np
 import pandas as _pd
-import scipy as _sp
-import sympy as _sym
 
 # Seaborn.
 import seaborn as _sns
@@ -264,7 +253,7 @@ def firstie (df, column, alt = None):
     Dohvati prvu definiranu vrijednost u stupcu tablice.
 
     Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
-    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    vrijednost u slucaju da su sve vrijednosti u stupcu column tablice df
     (pandas.DataFrame) nedefinirane (NaN).
 
     Povratna vrijednost je element u stupcu column tablice df ili alt.
@@ -283,7 +272,7 @@ def randomie (df, column, alt = None):
     Dohvati slucajno odabranu definiranu vrijednost u stupcu tablice.
 
     Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
-    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    vrijednost u slucaju da su sve vrijednosti u stupcu column tablice df
     (pandas.DataFrame) nedefinirane (NaN).
 
     Povratna vrijednost je element u stupcu column tablice df ili alt.
@@ -309,7 +298,7 @@ def lastie (df, column, alt = None):
     Dohvati zadnju definiranu vrijednost u stupcu tablice.
 
     Argument alt (opcionalan; zadana vrijednost je None) zadaje povratnu
-    vrijednsot u slucaju da su sve vrijednosti u stupcu column tablice df
+    vrijednost u slucaju da su sve vrijednosti u stupcu column tablice df
     (pandas.DataFrame) nedefinirane (NaN).
 
     Povratna vrijednost je element u stupcu column tablice df ili alt.

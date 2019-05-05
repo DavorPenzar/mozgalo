@@ -6,29 +6,7 @@ Skripta s funkcijama korisnima za mjerenje vremena.
 """
 
 # Standardna Python biblioteka.
-import copy as _copy
-import datetime as _datetime
-import functools as _functools
 import math as _math
-import os as _os
-import random as _random
-import six as _six
-import string as _string
-import sys as _sys
-import time as _time
-import warnings as _warnings
-
-# SciPy paketi.
-import matplotlib as _mpl
-import matplotlib.pyplot as _plt
-import numpy as _np
-import pandas as _pd
-import scipy as _sp
-import sympy as _sym
-
-# Seaborn.
-import seaborn as _sns
-
 # Definicija funkcije hms_time.
 def hms_time (duration):
     """
@@ -45,7 +23,7 @@ def hms_time (duration):
     """
 
     # Dohvati apsolutnu vrijednost argumenta duration.
-    duration = _math.fabs(duration)
+    duration = float(_math.fabs(duration))
 
     # Vrati trauzeni rjecnik.
     return {

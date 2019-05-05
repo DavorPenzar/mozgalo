@@ -1,36 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
-Skripta s klasom za racunanje tocnosti prediktivnog modela.
+Skripta s klasom za racunanje tocnosti prediktivnog modela (binarnog klasifikatora).
 
 """
 
 # Standardna Python biblioteka.
 import copy as _copy
-import datetime as _datetime
-import functools as _functools
 import math as _math
-import os as _os
-import random as _random
-import six as _six
-import string as _string
-import sys as _sys
-import time as _time
-import random as _random
-import six as _six
-import string as _string
-import warnings as _warnings
-
-# SciPy paketi.
-import matplotlib as _mpl
-import matplotlib.pyplot as _plt
-import numpy as _np
-import pandas as _pd
-import scipy as _sp
-import sympy as _sym
-
-# Seaborn.
-import seaborn as _sns
+import numbers as _numbers
 
 # Definicija klase Score.
 class Score (object):
@@ -47,16 +25,18 @@ class Score (object):
 
     """
 
-    def __new__ (cls, n_positives, n_negatives):
+    def __new__ (cls, n_positives = None, n_negatives = None):
+        assert issubclass(cls, Score)
+
         instance = super(Score, cls).__new__(cls)
 
-        instance._n_positives = _copy.deepcopy(int(n_positives))
-        instance._n_negatives = _copy.deepcopy(int(n_negatives))
+        instance._n_positives = 0
+        instance._n_negatives = 0
 
         instance._true_positives = 0
-        instance._false_positives = instance._n_positives
+        instance._false_positives = 0
         instance._true_negatives = 0
-        instance._false_negatives = instance._n_negatives
+        instance._false_negatives = 0
 
         instance._accuracy = 0.0
         instance._precision = 0.0
@@ -66,7 +46,21 @@ class Score (object):
         return instance
 
     def __init__ (self, n_positives, n_negatives):
-        pass
+        assert isinstance(self, Score)
+
+        assert (
+            isinstance(n_positives, _numbers.Integral) and
+            isinstance(n_negatives, _numbers.Integral)
+        )
+        assert n_positives > 0 and n_negatives > 0
+
+        instance._n_positives = _copy.deepcopy(int(n_positives))
+        instance._n_negatives = _copy.deepcopy(int(n_negatives))
+
+        instance._true_positives = 0
+        instance._false_positives = instance._n_positives
+        instance._true_negatives = 0
+        instance._false_negatives = instance._n_negatives
 
     def reset (self):
         """
@@ -86,6 +80,8 @@ class Score (object):
             Povratna vrijednost je self.
 
         """
+
+        assert isinstance(self, Score)
 
         # Ponisti ocjenu.
 
@@ -115,13 +111,6 @@ class Score (object):
         istom objektu spremiti ocjene dva ili vise prediktivna modela (za svaki
         model potrebno je kreirati zasebni objekt klase Score).
 
-        Ne provjerava se je li
-            true_positives +
-                false_positives +
-                true_negatives +
-                false_negatives ==
-            == n_positives + n_negatives.
-
         Arguments
         ---------
         true_positives : int
@@ -143,6 +132,27 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
+        # Provjeri sve argumente.
+
+        assert (
+            isinstance(true_positives, _numbers.Integral) and
+            isinstance(false_positives, _numbers.Integral) and
+            isinstance(true_negatives, _numbers.Integral) and
+            isinstance(false, _numbers.Integral) and
+        )
+        assert (
+            true_positives >= 0 and
+            false_positives >= 0 and
+            true_negatives >= 0 and
+            false_negatives >= 0
+        )
+        assert (
+            true_positives + false_negatives == n_positives and
+            false_positives + true_negatives == n_negatives
+        )
+
         # Ponisti ocjenu.
         self.reset()
 
@@ -151,18 +161,6 @@ class Score (object):
         self._false_positives = _copy.deepcopy(int(false_positives))
         self._true_negatives = _copy.deepcopy(int(true_negatives))
         self._false_negatives = _copy.deepcopy(int(false_positives))
-
-        # Provjeri sume
-        if (
-            (
-                (self._true_positives + self._false_negatives) !=
-                self._n_positives
-            ) or
-            (self._true_negatives + self._false_positives) != self._n_negatives
-        ):
-            self.reset()
-
-            raise ValueError('Suma <>.')
 
         # Izracunaj novu ocjenu.
 
@@ -179,34 +177,9 @@ class Score (object):
 
         return self
 
-    def F (self, beta = 1.0):
-        """
-        Izracunaj F_beta vrijednost ocjene.
-
-        Arguments
-        ---------
-        beta : float, optional
-            Parametar beta za F_beta ocjenu.  Zadana vrijednost je 1.0.
-
-        Returns
-        -------
-        f : float
-            F_beta vrijednost spremljene ocjene prediktivnog modela.
-
-        """
-
-        # Izracunaj beta^2.
-        beta2 = _copy.deepcopy(float(beta)) ** 2
-
-        # Izracunaj i vrati F_beta vrijednost ocjene.
-        return (
-            (1 + beta2) *
-            self._precision *
-            self._recall /
-            (beta2 ** self._precision + self._recall)
-        )
-
     def __repr__ (self):
+        assert isinstance(self, Score)
+
         return (
             '<'
                 '{name:s}: ('
@@ -225,6 +198,8 @@ class Score (object):
         )
 
     def __copy__ (self):
+        assert isinstance(self, Score)
+
         instance = Score(self._n_positives, self._n_negatives)
 
         instance._true_positives = self._true_positives
@@ -240,6 +215,8 @@ class Score (object):
         return instance
 
     def __deepcopy__ (self, memo = dict()):
+        assert isinstance(self, Score)
+
         instance = Score(
             _copy.deepcopy(self._n_positives, memo),
             _copy.deepcopy(self._n_negatives, memo)
@@ -264,6 +241,8 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._n_positives)
 
     @property
@@ -272,6 +251,8 @@ class Score (object):
         Ukupni broj negativnih instanci.
 
         """
+
+        assert isinstance(self, Score)
 
         return _copy.deepcopy(self._n_negatives)
 
@@ -282,6 +263,8 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._true_positives)
 
     @property
@@ -290,6 +273,8 @@ class Score (object):
         Broj krivo predvidenih pozitivnih instanci.
 
         """
+
+        assert isinstance(self, Score)
 
         return _copy.deepcopy(self._false_positives)
 
@@ -300,6 +285,8 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._true_negatives)
 
     @property
@@ -308,6 +295,8 @@ class Score (object):
         Broj krivo predvidenih negativnih instanci.
 
         """
+
+        assert isinstance(self, Score)
 
         return _copy.deepcopy(self._false_negatives)
 
@@ -318,6 +307,8 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._accuracy)
 
     @property
@@ -326,6 +317,8 @@ class Score (object):
         Preciznost prediktivnog modela.
 
         """
+
+        assert isinstance(self, Score)
 
         return _copy.deepcopy(self._precision)
 
@@ -336,6 +329,8 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._recall)
 
     @property
@@ -345,4 +340,42 @@ class Score (object):
 
         """
 
+        assert isinstance(self, Score)
+
         return _copy.deepcopy(self._specificity)
+
+    def F (self, beta = 1.0):
+        """
+        Izracunaj F_beta vrijednost ocjene.
+
+        Arguments
+        ---------
+        beta : float, optional
+            Parametar beta za F_beta ocjenu.  Zadana vrijednost je 1.0.
+
+        Returns
+        -------
+        f : float
+            F_beta vrijednost spremljene ocjene prediktivnog modela.
+
+        """
+
+        assert isinstance(self, Score)
+
+        # Provjeri argument.
+
+        assert isinstance(beta, _numbers.Real)
+        assert not (_math.isnan(beta) or _math.isinf(beta)) and beta > 0
+
+        # Izracunaj beta^2.
+        beta2 = _copy.deepcopy(float(beta)) ** 2
+
+        del beta
+
+        # Izracunaj i vrati F_beta vrijednost ocjene.
+        return (
+            (1.0 + beta2) *
+            self._precision *
+            self._recall /
+            (beta2 * self._precision + self._recall)
+        )
