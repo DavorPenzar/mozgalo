@@ -10,6 +10,9 @@ import copy as _copy
 import math as _math
 import numbers as _numbers
 
+# SciPy paketi.
+import numpy as _np
+
 # Definicija klase Score.
 class Score (object):
     """
@@ -54,13 +57,13 @@ class Score (object):
         )
         assert n_positives > 0 and n_negatives > 0
 
-        instance._n_positives = _copy.deepcopy(int(n_positives))
-        instance._n_negatives = _copy.deepcopy(int(n_negatives))
+        self._n_positives = _copy.deepcopy(int(n_positives))
+        self._n_negatives = _copy.deepcopy(int(n_negatives))
 
-        instance._true_positives = 0
-        instance._false_positives = instance._n_positives
-        instance._true_negatives = 0
-        instance._false_negatives = instance._n_negatives
+        self._true_positives = 0
+        self._false_positives = self._n_negatives
+        self._true_negatives = 0
+        self._false_negatives = self._n_positives
 
     def reset (self):
         """
@@ -86,9 +89,9 @@ class Score (object):
         # Ponisti ocjenu.
 
         self._true_positives = 0
-        self._false_positives = self._n_positives
+        self._false_positives = self._n_negatives
         self._true_negatives = 0
-        self._false_negatives = self._n_negatives
+        self._false_negatives = self._n_positives
 
         self._accuracy = 0.0
         self._precision = 0.0
@@ -140,7 +143,7 @@ class Score (object):
             isinstance(true_positives, _numbers.Integral) and
             isinstance(false_positives, _numbers.Integral) and
             isinstance(true_negatives, _numbers.Integral) and
-            isinstance(false, _numbers.Integral) and
+            isinstance(false_negatives, _numbers.Integral)
         )
         assert (
             true_positives >= 0 and
@@ -149,8 +152,8 @@ class Score (object):
             false_negatives >= 0
         )
         assert (
-            true_positives + false_negatives == n_positives and
-            false_positives + true_negatives == n_negatives
+            true_positives + false_negatives == self._n_positives and
+            false_positives + true_negatives == self._n_negatives
         )
 
         # Ponisti ocjenu.
@@ -164,17 +167,33 @@ class Score (object):
 
         # Izracunaj novu ocjenu.
 
-        self._accuracy = (
-            float(self._true_positives + self._true_negatives) /
-            (self._n_positives + self._n_negatives)
-        )
-        self._precision = (
-            float(self._true_positives) /
-            (self._true_positives + self._false_positives)
-        )
-        self._recall = float(self._true_positives) / self._n_positives
-        self._specificity = float(self._true_negatives) / self._n_negatives
+        try:
+            self._accuracy = (
+                float(self._true_positives + self._true_negatives) /
+                (self._n_positives + self._n_negatives)
+            )
+        except ZeroDivisionError:
+            self._accuracy = 0.0
 
+        try:
+            self._precision = (
+                float(self._true_positives) /
+                (self._true_positives + self._false_positives)
+            )
+        except ZeroDivisionError:
+            self._precision = 0.0
+
+        try:
+            self._recall = float(self._true_positives) / self._n_positives
+        except ZeroDivisionError:
+            self._recall = 0.0
+
+        try:
+            self._specificity = float(self._true_negatives) / self._n_negatives
+        except ZeroDivisionError:
+            self._specificity = 0.0
+
+        # Vrati self.
         return self
 
     def __repr__ (self):
@@ -344,14 +363,14 @@ class Score (object):
 
         return _copy.deepcopy(self._specificity)
 
-    def F (self, beta = 1.0):
+    def F (self, beta = 1):
         """
         Izracunaj F_beta vrijednost ocjene.
 
         Arguments
         ---------
         beta : float, optional
-            Parametar beta za F_beta ocjenu.  Zadana vrijednost je 1.0.
+            Parametar beta za F_beta ocjenu.  Zadana vrijednost je 1.
 
         Returns
         -------
@@ -372,10 +391,12 @@ class Score (object):
 
         del beta
 
+        # Izarcunaj vrijednosti razlomka za F_beta ocjenu.
+        numerator = (1 + beta2) * self._precision * self._recall
+        denominator = (beta2 * self._precision + self._recall)
+
         # Izracunaj i vrati F_beta vrijednost ocjene.
         return (
-            (1.0 + beta2) *
-            self._precision *
-            self._recall /
-            (beta2 * self._precision + self._recall)
+            numerator / denominator if not _np.isclose(1, 1 + denominator)
+                else 0.0
         )
