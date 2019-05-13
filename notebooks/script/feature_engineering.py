@@ -197,8 +197,8 @@ def transform (df, transformers):
     I u tom slucaju transormer moze biti None cime se u povratnu tablicu
     prepisuju stupci u onom poretku u kojem su zadani u listi column.
 
-    Ako transformers nije dict, od istog se stupca originalne tablice moze
-    u povratnoj tablici moze konstruirati vise transformacija (u objektu
+    Ako transformers nije dict, od istog se stupca originalne tablice u
+    povratnoj tablici moze konstruirati vise transformacija (u objektu
     transformers moze se pojaviti vise uredenih parova cija je prva komponenta
     jednaka).
 
