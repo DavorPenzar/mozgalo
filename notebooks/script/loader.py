@@ -23,18 +23,45 @@ from pandas.core.series import Series as Series
 ##  PRIPREMA OBLIKOVANJA
 ##      *   Sljedece varijable namjesti po izboru.
 
+# Znak za razdvajanje direktorija u lokacijama datoteka.
+DIR_DELIMITER = '/'
+#DIR_DELIMITER = "\\"
+
 # Pretpotavljena ekstenzija ulazne datoteke.
 DEFAULT_IN_EXTENSION = 'csv'
 
-# ekstenzija izlazne datoteke.
+# Ekstenzija izlazne datoteke.
 OUT_EXTENSION = 'pkl'
 
 # Funkcije za ucitavanje i zapisivanje podataka.
 READER = pd.read_csv
+    # poziv:
+    #     >>> READER(
+    #     ...     in_name,
+    #     ...     header = HEADER,
+    #     ...     index_col = INDEX_COL,
+    #     ...     parse_dates = DATE_COLUMNS,
+    #     ...     infer_datetime_format = True,
+    #     ...     false_values = BOOLEAN_VALUES[False],
+    #     ...     true_values = BOOLEAN_VALUES[True]
+    #     ... )
+    # gdje je in_name "string" (objekt klase `str') s vrijednosti lokacije
+    # datoteke iz koje se cita tablica, a ostale vrijednosti zadane su
+    # varijablama nize.
 WRITER = DataFrame.to_pickle
+    # poziv:
+    #     >>> WRITER(df, out_name)
+    # gdje je df tablica (objekt klase `pandas.DataFrame'), a out_name "string"
+    # (objekt klase `str') s vrijednosti lokacije datoteke u koju se tablica
+    # sprema.
+
+# Redak s nazivima stupaca.
+HEADER = 'infer'
+#HEADER = 0
 
 # Stupac s indeksima redaka.
 INDEX_COL = None
+#INDEX_COL = 0
 
 # Oznake istina i lazi.
 BOOLEAN_VALUES = {
@@ -86,7 +113,7 @@ assert isinstance(sys.argv[0], str) and isinstance(sys.argv[1], str)
 
 # Deduciraj ime ulazne datoteke i ekstenziju.
 in_name = sys.argv[1]
-last_dir = max(in_name.rfind('/'), in_name.rfind("\\"))
+last_dir = in_name.rfind(DIR_DELIMITER)
 partial = in_name[last_dir + 1:].split('.')
 if last_dir != -1:
     partial[0] = in_name[:last_dir + 1] + partial[0]
@@ -120,6 +147,7 @@ del extension
 # Ucitaj tablicu.
 df = READER(
     in_name,
+    header = HEADER,
     index_col = INDEX_COL,
     parse_dates = DATE_COLUMNS,
     infer_datetime_format = True,
@@ -127,8 +155,14 @@ df = READER(
     true_values = BOOLEAN_VALUES[True]
 )
 
+# Provjeri je li tablica objekt klase pandas.DataFrame.
+assert isinstance(df, DataFrame)
+
 # Indeksiraj tablicu.
 df = INDEXER(df)
+
+# Provjeri je li tablica objekt klase pandas.DataFrame.
+assert isinstance(df, DataFrame)
 
 # Izbaci stupce za izbaciti.
 df.drop(columns = DROP_COLUMNS, inplace = True, errors = 'ignore')
