@@ -122,7 +122,7 @@ def ispuni (df, prediktor, pretprocesor = None):
     if pretprocesor is not None:
         spljosteni = pretprocesor(spljosteni)
 
-    spljosteni.PRIJEVREMENI_RASKID = prediktor(spljosteni.loc[].drop(columns = ['instance_id', 'PRIJEVREMENI_RASKID'], errors = 'ignore'))
+    spljosteni.PRIJEVREMENI_RASKID = prediktor(spljosteni.drop(columns = ['instance_id', 'PRIJEVREMENI_RASKID'], errors = 'ignore'))
     spljosteni.loc[spljosteni.]
 
     df.loc[spljosteni.instance_id] = spljosteni.PRIJEVREMENI_RASKID
