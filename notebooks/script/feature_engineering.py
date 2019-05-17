@@ -15,9 +15,6 @@ import matplotlib.pyplot as _plt
 import numpy as _np
 import pandas as _pd
 
-# Seaborn.
-import seaborn as _sns
-
 # Definicija funkcije grouppie.
 def grouppie (df, columns, values, final_groups = None):
     """
