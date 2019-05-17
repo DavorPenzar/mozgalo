@@ -112,13 +112,18 @@ def spljosti (df, n_proc = 4):
     return znacajcki_df
 
 def ispuni (df, prediktor, pretprocesor = None):
+    interval = _pd.Timedelta(10, 'D')
+
     df.PRIJEVREMENI_RASKID = 0
     spljosteni = spljosti(df)
+
+    spljosteni = spljosteni.loc[spljosteni.ZADNJI_PLANIRANI_DATUM_ZATVARANJA - spljosteni.ZADNJI_DATUM_OTVARANJA > interval].copy()
 
     if pretprocesor is not None:
         spljosteni = pretprocesor(spljosteni)
 
-    spljosteni.PRIJEVREMENI_RASKID = prediktor(spljosteni.drop(columns = ['instance_id', 'PRIJEVREMENI_RASKID'], errors = 'ignore'))
+    spljosteni.PRIJEVREMENI_RASKID = prediktor(spljosteni.loc[].drop(columns = ['instance_id', 'PRIJEVREMENI_RASKID'], errors = 'ignore'))
+    spljosteni.loc[spljosteni.]
 
     df.loc[spljosteni.instance_id] = spljosteni.PRIJEVREMENI_RASKID
 

@@ -38,7 +38,7 @@ def kategoriziraj (df):
         'ZADNJI_TIP_KAMATE'
     ]
 
-    for stupac in stupci:
+    for stupac in iter(stupci):
         vrijednosti = df[stupac].dropna().unique()
 
         if isinstance(vrijednosti, _Categorical):
@@ -86,11 +86,11 @@ def spljosti (df, n_proc = 4):
     znacajke = [
         ('DATUM_IZVJESTAVANJA', _functools.partial(bas_zadnji, stupac = 'DATUM_IZVJESTAVANJA')),
         ('KLIJENT_ID', _functools.partial(bas_prvi, stupac = 'KLIJENT_ID')),
-        ('OZNAKA_PARTIJE', _functools.partial(bas_prvi, stupac = 'KLIJENT_ID')),
+        ('OZNAKA_PARTIJE', _functools.partial(bas_prvi, stupac = 'OZNAKA_PARTIJE')),
         ('PRVI_DATUM_OTVARANJA', _functools.partial(bas_prvi, stupac = 'DATUM_OTVARANJA')),
         ('ZADNJI_DATUM_OTVARANJA', _functools.partial(bas_zadnji, stupac = 'DATUM_OTVARANJA')),
-        ('PRVI_PLANIRANI_DATUM_ZATVARANJA', _functools.partial(bas_prvi, stupac = 'PLANIRANI_DATUM_ZATVARANJA')),
-        ('ZADNJI_PLANIRANI_DATUM_ZATVARANJA', _functools.partial(bas_zadnji, stupac = 'PLANIRANI_DATUM_ZATVARANJA')),
+        ('PRVI_PLANIRANI_DATUM_ZATVARANJA', _functools.partial(firstie, column = 'PLANIRANI_DATUM_ZATVARANJA')),
+        ('ZADNJI_PLANIRANI_DATUM_ZATVARANJA', _functools.partial(lastie, column = 'PLANIRANI_DATUM_ZATVARANJA')),
         ('VRSTA_KLIJENTA', _functools.partial(bas_prvi, stupac = 'VRSTA_KLIJENTA')),
         ('STAROST', _functools.partial(bas_zadnji, stupac = 'STAROST')),
         ('VRSTA_PROIZVODA', _functools.partial(bas_prvi, stupac = 'VRSTA_PROIZVODA')),
@@ -142,7 +142,7 @@ def lose_oznake_partija (df, n_proc = 4):
             (df.STAROST < 0).any() or
             (df.STAROST >= 500).any() or
             (df.UGOVORENI_IZNOS <= 0).any() or
-            _pd.isnull(df.PLANIRANI_DATUM_ZATVARANJA).any() or
+#           _pd.isnull(df.PLANIRANI_DATUM_ZATVARANJA).any() or
             (df.PLANIRANI_DATUM_ZATVARANJA < df.DATUM_OTVARANJA).any() or
             (df.DATUM_ZATVARANJA < df.DATUM_OTVARANJA).any()
         )
