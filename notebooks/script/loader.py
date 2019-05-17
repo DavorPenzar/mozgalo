@@ -155,6 +155,8 @@ df = READER(
     true_values = BOOLEAN_VALUES[True]
 )
 
+WRITER(df, out_name)
+
 # Provjeri je li tablica objekt klase pandas.DataFrame.
 assert isinstance(df, DataFrame)
 
