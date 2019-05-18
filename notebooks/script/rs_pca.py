@@ -548,7 +548,7 @@ class RS_PCA (object):
         columns : None or Index, optional
             Lista kategorickih stupaca nad kojima se vrsi RS-PCA.  Ako None,
             analiza se vrsi nad svim stupcima dane tablice ciji je tip
-            vrijednosti object ili CategoricalDtype.
+            vrijednosti object ili pandas.CategoricalDtype.
 
         save_temp : None or boolean, optional
             Ako True, dijelovi LRSV matrice tablice df (ako je redaka tablice df
