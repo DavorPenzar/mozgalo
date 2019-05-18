@@ -114,6 +114,9 @@ def spljosti (df, n_proc = 4):
 def ispuni (df, prediktor, pretprocesor = None):
     interval = _pd.Timedelta(10, 'D')
 
+    stari_index = df.index
+    df.index = df.instance_id
+
     df.PRIJEVREMENI_RASKID = 0
     spljosteni = spljosti(df)
 
@@ -123,8 +126,9 @@ def ispuni (df, prediktor, pretprocesor = None):
         spljosteni = pretprocesor(spljosteni)
 
     spljosteni.PRIJEVREMENI_RASKID = prediktor(spljosteni.drop(columns = ['instance_id', 'PRIJEVREMENI_RASKID'], errors = 'ignore'))
-    spljosteni.loc[spljosteni.]
 
-    df.loc[spljosteni.instance_id] = spljosteni.PRIJEVREMENI_RASKID
+    df.loc[spljosteni.instance_id, 'PRIJEVREMENI_RASKID'] = spljosteni.PRIJEVREMENI_RASKID
+
+    df.index = stari_index
 
     return df
