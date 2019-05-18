@@ -186,8 +186,6 @@ def pocisti_drugacije (df, n_proc = 4):
     spljosteni = spljosteni.loc[spljosteni.PRIJEVREMENI_RASKID | (spljosteni.ZADNJI_PLANIRANI_DATUM_ZATVARANJA - spljosteni.DATUM_IZVJESTAVANJA <= interval)].copy()
     pojednostavi_indeks(spljosteni)
 
-    spljosteni.STAROST -= _np.round(((spljosteni.DATUM_IZVJESTAVANJA - spljosteni.ZADNJI_DATUM_OTVARANJA).dt.days / 365.2475)).astype(int)
-
     spljosteni.drop(columns = ['DATUM_IZVJESTAVANJA'], inplace = True)
 
     kategoriziraj(spljosteni)
