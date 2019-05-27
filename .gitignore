@@ -3,9 +3,6 @@
 # Data
 data/
 
-# Trenirane mreze
-Trenirane_mreze*/
-
 ##  ORIGINAL .gitignore FOR PYTHON
 
 # Byte-compiled / optimized / DLL files
