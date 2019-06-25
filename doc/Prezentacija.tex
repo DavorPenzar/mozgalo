@@ -11,6 +11,8 @@
 \usepackage{amstext}
 \usepackage{amsthm}
 \usepackage{listings}
+    \renewcommand*{\lstlistingname}{K\^{o}d}
+    \renewcommand*{\lstlistlistingname}{popis k\^{o}dova}
 \usepackage{mathtools}
 \usepackage[nosepfour]{numprint}
 \usepackage{pgfplots}
@@ -242,7 +244,7 @@
         \end{enumerate}
     \end{frame}
 
-    \begin{frame}{\href{http://catboost.ai/}{\emph{CatBoost}}}
+    \begin{frame}{{\hypersetup{hidelinks}\href{http://catboost.ai/}{\emph{CatBoost}}}}
         \begin{itemize}[<+->]
             \item \href{http://catboost.ai/docs/concepts/python-reference_catboostclassifier.html}{\lstinline[style = lijepo, language = Python]{CatBoostClassifier}} --- ansambl stabala odlučivanja razvijen \emph{jačanjem} (eng.\ \emph{boosting})
             \item $ \numprint{3} $ modela
@@ -253,6 +255,15 @@
             \end{itemize}
             \item svi su modeli konstruirani simetričnim stablima --- \halfemph{interpretabilnost}
         \end{itemize}
+    \end{frame}
+
+    \begin{frame}{Hiperparametri}
+        \only<1>{%
+            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer konstrukcije modela}, label = {lst:model}]{model.py}%
+        }
+        \only<2>{%
+            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer treniranja modela}, label = {lst:fit}]{fit.py}%
+        }
     \end{frame}
 
     %http://towardsdatascience.com/a-conceptual-explanation-of-bayesian-model-based-hyperparameter-optimization-for-machine-learning-b8172278050f
@@ -346,7 +357,7 @@
     \begin{frame}{Rezultati}{Vlastiti validacijski \emph{dataset}}
         \begin{table}[htb!]
             \centering
-            \caption{Evaluacijske mjrere modela}
+            \caption{Evaluacijske mjere modela}
             \label{tab:rezultati_vlastita_validacija}
             \begin{tabular}{| l | c | c | c | c |}
                 \hline
