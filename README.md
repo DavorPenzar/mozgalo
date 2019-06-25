@@ -7,4 +7,4 @@ Tim _Petty_:
   * Davor Penzar,
   * Domagoj Ravlić.
 
-**Napomena.** Datoteka sa skupom podataka je prevelika i ne može se postaviti na *GitHub*.
+**Napomena.** Datoteka sa skupom podataka (`data/`) je prevelika i ne može se postaviti na *GitHub*. Kopije nekih naših tablica su, doduše, i u glavnom repozitoriju.

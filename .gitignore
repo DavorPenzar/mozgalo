@@ -2,9 +2,7 @@
 
 # Data
 data/
-
-# Trenirane mreze
-Trenirane_mreze*/
+dataNovi/
 
 ##  ORIGINAL .gitignore FOR PYTHON
 
