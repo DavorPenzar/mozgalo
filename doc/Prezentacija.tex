@@ -12,7 +12,7 @@
 \usepackage{amsthm}
 \usepackage{listings}
     \renewcommand*{\lstlistingname}{K\^{o}d}
-    \renewcommand*{\lstlistlistingname}{popis k\^{o}dova}
+    \renewcommand*{\lstlistlistingname}{Popis k\^{o}dova}
 \usepackage{mathtools}
 \usepackage[nosepfour]{numprint}
 \usepackage{pgfplots}
@@ -234,7 +234,13 @@
                 \item svi primjeri s istom oznakom partije spljošte se u $ \numprint{1} $ primjer
                 \item pamte se prva i zadnja varirajuća značajka
             \end{itemize}
-            \item makroekonomske značajke (BDP, inflacija, nezaposlenost, cijena nafte)
+            \item makroekonomske značajke
+            \begin{itemize}[<+->]
+                \item BDP
+                \item inflacija
+                \item nezaposlenost
+                \item cijena nafte
+            \end{itemize}
             \item kombinacije značajki
             \begin{itemize}[<+->]
                 \item trajanje, trajanje u krizi, promjene značajki
@@ -259,10 +265,10 @@
 
     \begin{frame}{Hiperparametri}
         \only<1>{%
-            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer konstrukcije modela}, label = {lst:model}]{model.py}%
-        }
+            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer konstrukcije modela}, label = {lst:model}]{Kodovi/model.py}%
+        }%
         \only<2>{%
-            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer treniranja modela}, label = {lst:fit}]{fit.py}%
+            \lstinputlisting[style = lijepo, stepnumber = 0, basicstyle = {\footnotesize \ttfamily \color{alpha}}, language = Python, caption = {Primjer treniranja modela}, label = {lst:fit}]{Kodovi/fit.py}%
         }
     \end{frame}
 
@@ -373,7 +379,7 @@
         \end{table}
     \end{frame}
 
-    \begin{frame}{Rezultati}{\href{http://www.estudent.hr/category/natjecanja/mozgalo/}{\emph{Mozgalo}} $ \numprint{2019} $.\ -- evaluacijski i validacijski \emph{dataset}}
+    \begin{frame}{Rezultati}{{\hypersetup{hidelinks}\href{http://www.estudent.hr/category/natjecanja/mozgalo/}{\emph{Mozgalo}} $ \numprint{2019} $.\ -- evaluacijski i validacijski \emph{dataset}}}
         \begin{table}[htb!]
             \centering
             \caption{Rezultati na natjecanju}
@@ -385,7 +391,7 @@
                 Evaluacija & $ \unit[\numprint{71}]{\%} $ & $ \unit[\numprint{77}]{\%} $ & $ \numprint{14} / \numprint{15} $ \\
                 Validacija & $ \unit[\numprint{69}]{\%} $ & $ \unit[\numprint{70}]{\%} $ & $ \numprint{17} / \numprint{20} $ \\
                 \hline
-                \multicolumn{3}{l |}{ } & $ \numprint{31} / \numprint{35} $ \\
+                \multicolumn{3}{l |}{ } & $ \mathbf{\numprint{31}} / \mathbf{\numprint{35}} $ \\
                 \cline{4-4}
             \end{tabular}
         \end{table}
@@ -434,7 +440,7 @@
     \begin{frame}{Programska realizacija}
         \centering
         \Huge
-        \href{run:jupyter.sh}{Implementacija}
+        \href{run:jupyter.sh}{Implementacija \ding{40}}
     \end{frame}{}
 
     \begin{frame}[allowframebreaks]{Literatura}
